@@ -1,0 +1,2 @@
+handle_splash:
+    ret
