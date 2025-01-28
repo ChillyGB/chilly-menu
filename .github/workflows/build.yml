@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install rgbds
+      run: |
+        wget "https://github.com/gbdev/rgbds/releases/download/v0.9.0/rgbds-0.9.0-linux-x86_64.tar.xz"
+        mkdir rgbds
+        tar xf rgbds-0.9.0-linux-x86_64.tar.xz -C rgbds
+        cd rgbds
+        sudo ./install.sh
+
+
+    - name: Build
+      run: bash build.sh
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: chilly-menu
+        path: |
+          build/boot.gb
