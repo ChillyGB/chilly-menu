@@ -24,10 +24,37 @@ entry_point:
 	ld [rNR52], a
 	ld [rLCDC], a
 
+	; Clear OAM
+	ld d, $a0
+	ld hl, $fe00
+	ld a, 0
+clear_oam:
+	ld [hli], a
+	dec d
+	jp nz, clear_oam
+
+	ld hl, $fe00
+	ld a, 32
+	ld [hli], a
+	ld a, 12
+	ld [hli], a
+	ld a, 1
+	ld [hli], a
+	ld a, 0
+	ld [hli], a
+	ld a, 48
+	ld [hli], a
+	ld a, 12
+	ld [hli], a
+	ld a, 1
+	ld [hli], a
+	ld a, $40
+	ld [hli], a
+
 	; Write tiles
 	ld bc, char_tiles
 	ld de, char_tiles.end - char_tiles
-	ld hl, $8200
+	ld hl, $8000
 load_tiles:
 	ld a, [bc]
 	ld [hli], a
@@ -62,10 +89,11 @@ load_tilemap_window:
 	or a, e
 	jp nz, load_tilemap_window
 
-	; Turn PPU on
-
+	; Initialize registers
 	ld a, %11100100
 	ld [rBGP], a
+	ld [rOBP0], a
+	ld [rOBP1], a
 
 	ld a, 1
 	ld [rIE], a
@@ -77,13 +105,19 @@ load_tilemap_window:
 	ld [rSTAT], a
 
 	ld a, 0
-	ld [SELECTED_ROM], a
+	ld [rSELECTED_ROM], a
 
 	ld a, 0
 	ld [CURRENT_PAGE], a
 
 	ld a, 1
 	ld [NEED_UPDATE], a
+
+	ld a, 0
+	ld [RTC_EDIT_MODE], a
+
+	ld a, 0
+	ld [SELECTED_RTC], a
 
 	ld a, 2
 	ld [SPLASH_SCREEN], a
@@ -94,6 +128,7 @@ load_tilemap_window:
 	ld a, 7
 	ld [rWX], a
 
+	; Turn PPU on
 	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_BG8000 | LCDCF_WINON | LCDCF_WIN9C00
 	ld [rLCDC], a
 

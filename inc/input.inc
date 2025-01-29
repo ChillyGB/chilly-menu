@@ -37,7 +37,7 @@ update_keys:
 set_current_selection_long:
     ld hl, CURRENT_SELECTION_LONG
     ld [hl], 0
-    ld a, [SELECTED_ROM]
+    ld a, [rSELECTED_ROM]
     ld de, $20
     ld hl, $9854
     and a
@@ -57,7 +57,7 @@ loop_selection_check_end:
 prev_selection:
     ld hl, SCX_SELECTED
     ld [hl], 0
-    ld hl, SELECTED_ROM
+    ld hl, rSELECTED_ROM
     ld a, [hl]
     and a
     jp z, dont_decrement_sel
@@ -70,7 +70,7 @@ dont_decrement_sel:
 next_selection:
     ld hl, SCX_SELECTED
     ld [hl], 0
-    ld hl, SELECTED_ROM
+    ld hl, rSELECTED_ROM
     ld a, [hl]
     cp 13
     jp z, dont_increment_sel
@@ -90,7 +90,7 @@ prev_page:
     dec a
 dont_decrement_page:
     ld [hl], a
-    ld hl, SELECTED_ROM
+    ld hl, rSELECTED_ROM
     ld [hl], 0
     ret
 
@@ -107,16 +107,16 @@ next_page:
     inc a
 dont_increment_page:
     ld [hl], a
-    ld hl, SELECTED_ROM
+    ld hl, rSELECTED_ROM
     ld [hl], 0
     ret
 
 prev_dir:
     ld hl, NEED_UPDATE
     ld [hl], 1
-    ld hl, $a000
+    ld hl, rLOAD_SELECTED
     ld [hl], 1
-    ld hl, SELECTED_ROM
+    ld hl, rSELECTED_ROM
     ld [hl], 0
     ld hl, CURRENT_PAGE
     ld [hl], 0
@@ -125,15 +125,109 @@ prev_dir:
 open_selected:
     ld hl, NEED_UPDATE
     ld [hl], 1
-    ld hl, $a000
+    ld hl, rLOAD_SELECTED
     ld a, [hl]
     and a
     jp z, game_loader
     ld [hl], 0
-    ld hl, SELECTED_ROM
+    ld hl, rSELECTED_ROM
     ld [hl], 0
     ld hl, CURRENT_PAGE
     ld [hl], 0
+    ret
+
+disable_rtc_edit:
+    ld hl, rLCDC
+    res 1, [hl]
+    ld hl, RTC_EDIT_MODE
+    ld [hl], 0
+    ret
+
+enable_rtc_edit:
+    ld hl, rLCDC
+    set 1, [hl]
+    ld hl, RTC_EDIT_MODE
+    ld [hl], 1
+    ret
+
+prev_rtc_selection:
+    ; check if rtc edit is enabled
+    ld hl, RTC_EDIT_MODE
+    ld a, [hl]
+    and a
+    ret z
+
+    ld hl, SELECTED_RTC
+    ld a, [hl]
+    and a
+    ret z
+
+    ld hl, NEED_RTC_UPDATE
+    ld [hl], 1
+
+    ld hl, SELECTED_RTC
+    dec [hl]
+    ret
+
+next_rtc_selection:
+    ; check if rtc edit is enabled
+    ld hl, RTC_EDIT_MODE
+    ld a, [hl]
+    and a
+    ret z
+
+    ld hl, SELECTED_RTC
+    ld a, [hl]
+    cp 5
+    ret z
+
+    ld hl, NEED_RTC_UPDATE
+    ld [hl], 1
+
+    ld hl, SELECTED_RTC
+    inc [hl]
+    ret
+
+get_selected_rtc:
+    ld hl, SELECTED_RTC
+    ld a, [hl]
+    cp 0
+    jp z, rtc_case_0
+    cp 1
+    jp z, rtc_case_1
+    cp 2
+    jp z, rtc_case_2
+    cp 3
+    jp z, rtc_case_3
+    cp 4
+    jp z, rtc_case_4
+    cp 5
+    jp z, rtc_case_5
+    ret
+rtc_case_0:
+    ld hl, rDAY
+    ret
+rtc_case_1:
+    ld hl, rMONTH
+    ret
+rtc_case_2:
+    ld hl, rYEAR
+    ret
+rtc_case_3:
+    ld hl, rHOURS
+    ret
+rtc_case_4:
+    ld hl, rMINUTES
+    ret
+rtc_case_5:
+    ld hl, rSECONDS
+    ret
+
+save_rtc:
+    ld hl, NEED_UPDATE
+    ld [hl], 1
+    ld hl, rRTC_SAVE
+    ld [hl], 1
     ret
 
 handle_input:
@@ -150,6 +244,8 @@ skip_entry_fix:
     ld [hl], a
     ld hl, NEED_UPDATE
     ld [hl], 1
+    ld hl, rLCDC
+    res 1, [hl]
 check_next:
     ld hl, MENU_ENTRY
 	ld a, [hl]
@@ -159,7 +255,6 @@ check_next:
 	jp z, input_rtc
 	cp 2
 	jp z, input_handle_end
-
 ; Input when in Files menu
 input_files:
 check_up_files:
@@ -192,9 +287,56 @@ check_a_files:
     and a, PADF_A
     jp z, input_handle_end
     call open_selected
-
+    jp input_handle_end
 ; Input when in RTC menu
 input_rtc:
+check_up_rtc:
+    ld a, [wNEW_KEYS]
+    and a, PADF_UP
+    jp z, check_down_rtc
+    ld a, [RTC_EDIT_MODE]
+    and a
+    jp z, check_down_rtc
+    ld hl, NEED_RTC_UPDATE
+    ld [hl], 1
+    call get_selected_rtc
+    inc [hl]
+check_down_rtc:
+    ld a, [wNEW_KEYS]
+    and a, PADF_DOWN
+    jp z, check_left_rtc
+    ld a, [RTC_EDIT_MODE]
+    and a
+    jp z, check_left_rtc
+    ld hl, NEED_RTC_UPDATE
+    ld [hl], 1
+    call get_selected_rtc
+    dec [hl]
+check_left_rtc:
+    ld a, [wNEW_KEYS]
+    and a, PADF_LEFT
+    jp z, check_right_rtc
+    call prev_rtc_selection
+check_right_rtc:
+    ld a, [wNEW_KEYS]
+    and a, PADF_RIGHT
+    jp z, check_b_rtc
+    call next_rtc_selection
+check_b_rtc:
+    ld a, [wNEW_KEYS]
+    and a, PADF_B
+    jp z, check_a_rtc
+    call disable_rtc_edit
+check_a_rtc:
+    ld a, [wNEW_KEYS]
+    and a, PADF_A
+    jp z, check_start_rtc
+    call enable_rtc_edit
+check_start_rtc:
+    ld a, [wNEW_KEYS]
+    and a, PADF_START
+    jp z, input_handle_end
+    call save_rtc
     jp input_handle_end
 input_handle_end:
     ret

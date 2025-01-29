@@ -18,6 +18,7 @@ no_splash:
 	call update_keys
 	call handle_input
     call update_menu
+    call update_rtc
     reti
 
 stat_interrupt:
@@ -29,7 +30,7 @@ wait_mode0:
     and a
     jr nz, wait_mode0
 
-    ld hl, SELECTED_ROM
+    ld hl, rSELECTED_ROM
     ld b, [hl]
     inc b
     inc b

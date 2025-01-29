@@ -30,12 +30,12 @@ it will read 0xff if the current selection is not a valid rom
 
 WARNING: Write to this register can clear the rom content. Always check if the current selection is a directory or a file before writing 0x0 here. If the selected item is file disable interrupts and execute code from WRAM or HRAM
 
-### A001 Save Backup (Read/Write)
+### A001 Save copy to SD card (Read/Write)
 
-Reads $0 when Save content is backupped
-Reads $1 when Save content is not backupped
+Reads $0 when Save content was copied to SD card at least one time
+Reads $1 when Save content was not copied to SD card
 Reads $FF when Save is backupping
-Writing any values will start the backup process
+Writing any values will start the current save to SD card
 
 ### A002 Copy file list (Read/Write)
 

@@ -29,6 +29,20 @@ final_num:
 	pop af
 	ret
 
+num_to_ascii_10:
+	ld [hl], $30
+loop_10_10:
+	cp 10
+	jp c, final_num_10
+	sub a, 10
+	inc [hl]
+	jp loop_10_10
+final_num_10:
+	inc hl
+	add $30
+	ld [hl], a
+	ret
+
 clear_tilemap:
 	ld hl, $9800
 	ld bc, $9c00 - $9800
@@ -41,15 +55,64 @@ loop_clear_vram:
 	jp nz, loop_clear_vram
 	ret
 
+write_time:
+	; Write separators
+	ld a, "/"
+	ld hl, $9862
+	ld [hl], a
+	inc hl
+	inc hl
+	inc hl
+	ld [hl], a
+	ld a, ":"
+	ld hl, $98a2
+	ld [hl], a
+	inc hl
+	inc hl
+	inc hl
+	ld [hl], a
+
+	; Write date
+	ld a, [rDAY]
+	ld hl, $9860
+	call num_to_ascii_10
+
+	ld a, [rMONTH]
+	ld hl, $9863
+	call num_to_ascii_10
+
+	ld a, 20
+	ld hl, $9866
+	call num_to_ascii_10
+
+	ld a, [rYEAR]
+	ld hl, $9868
+	call num_to_ascii_10
+
+	; Write time
+	ld a, [rHOURS]
+	ld hl, $98a0
+	call num_to_ascii_10
+
+	ld a, [rMINUTES]
+	ld hl, $98a3
+	call num_to_ascii_10
+
+	ld a, [rSECONDS]
+	ld hl, $98a6
+	call num_to_ascii_10
+
+	ret
+
 update_menu:
 	; Check if an update is needed
 	ld hl, NEED_UPDATE
 	ld a, [hl]
 	and a
 	ret z
+	ld [hl], 0
 
 	; Wait for vblank for turning PPU off
-	ld [hl], 0
 	call wait_vblank
 	ld hl, rLCDC
 	res 7, [hl]
@@ -128,7 +191,9 @@ loop_load_text_title_2:
 	dec d
 	jp nz, loop_load_text_title_2
 
-	; TODO
+	ld hl, $a004
+	ld [hl], 0
+	call write_time
 
 	jp load_current_view_end
 ; ABOUT ENTRY
@@ -187,6 +252,98 @@ game_list:
 	jp nz, game_list
     ret
 
+update_rtc:
+	ld hl, NEED_RTC_UPDATE
+	ld a, [hl]
+	and a
+	ret z
+	ld [hl], 0
+
+	ld hl, SELECTED_RTC
+	ld a, [hl]
+	cp 0
+	jp z, move_to_day
+	cp 1
+	jp z, move_to_month
+	cp 2
+	jp z, move_to_year
+	cp 3
+	jp z, move_to_hours
+	cp 4
+	jp z, move_to_minutes
+	cp 5
+	jp z, move_to_seconds
+	jp move_end
+move_to_day:
+	ld hl, $fe00
+	ld [hl], 32
+	inc hl
+	ld [hl], 12
+
+	ld hl, $fe04
+	ld [hl], 48
+	inc hl
+	ld [hl], 12
+	jp move_end
+move_to_month:
+	ld hl, $fe00
+	ld [hl], 32
+	inc hl
+	ld [hl], 36
+
+	ld hl, $fe04
+	ld [hl], 48
+	inc hl
+	ld [hl], 36
+	jp move_end
+move_to_year:
+	ld hl, $fe00
+	ld [hl], 32
+	inc hl
+	ld [hl], 76
+
+	ld hl, $fe04
+	ld [hl], 48
+	inc hl
+	ld [hl], 76
+	jp move_end
+move_to_hours:
+	ld hl, $fe00
+	ld [hl], 48
+	inc hl
+	ld [hl], 12
+
+	ld hl, $fe04
+	ld [hl], 64
+	inc hl
+	ld [hl], 12
+	jp move_end
+move_to_minutes:
+	ld hl, $fe00
+	ld [hl], 48
+	inc hl
+	ld [hl], 36
+
+	ld hl, $fe04
+	ld [hl], 64
+	inc hl
+	ld [hl], 36
+	jp move_end
+move_to_seconds:
+	ld hl, $fe00
+	ld [hl], 48
+	inc hl
+	ld [hl], 60
+
+	ld hl, $fe04
+	ld [hl], 64
+	inc hl
+	ld [hl], 60
+	jp move_end
+move_end:
+	call write_time
+	ret
+
 game_loader:
 	ld bc, game_loader_ram
 	ld de, game_loader_ram.end - game_loader_ram
@@ -203,7 +360,7 @@ game_loader_loop:
 
 game_loader_ram::
 	di
-	ld hl, $a000
+	ld hl, rLOAD_SELECTED
 	ld [hl], 0
 .waiting_for_game
 	jr .waiting_for_game
