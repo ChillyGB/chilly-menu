@@ -8,7 +8,7 @@ A simple menu for ChillyCart
 - [x] About entry
 - [x] Game loader
 - [x] Basic splash screen
-- [ ] RTC entry
+- [x] RTC entry
 - [ ] Animated splash
 - [ ] Snow background
 - [ ] Sounds

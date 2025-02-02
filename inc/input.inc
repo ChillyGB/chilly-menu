@@ -246,6 +246,8 @@ skip_entry_fix:
     ld [hl], 1
     ld hl, rLCDC
     res 1, [hl]
+    ld hl, RTC_EDIT_MODE
+    res 0, [hl]
 check_next:
     ld hl, MENU_ENTRY
 	ld a, [hl]
