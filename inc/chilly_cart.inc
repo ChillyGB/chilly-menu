@@ -228,15 +228,7 @@ load_current_view_end:
 	ret
 
 load_current_page_to_vram:
-    ; Load directory
-    ld hl, CURRENT_PAGE
-	ld a, [hl]
-	ld hl, rCOPYFILELIST
-	ld [hl], a
-wait_directory_finish:
-	ld a, [hl]
-	and a
-	jp z, wait_directory_finish
+	call $c200
 
 	; Write game list to VRAM
 	ld bc, $b000
@@ -364,6 +356,21 @@ game_loader_ram::
 	ld [hl], 0
 .waiting_for_game
 	jr .waiting_for_game
+.end:
+
+game_list_loader_ram::
+    ; Load directory
+    ld hl, CURRENT_PAGE
+	ld a, [hl]
+	ld hl, rCOPYFILELIST
+	ld [hl], a
+
+	ld hl, rCOPYFILELIST
+.wait_directory_finish:
+	ld a, [hl]
+	and a
+	jr z, .wait_directory_finish
+	ret
 .end:
 
 menu_text_title_1::

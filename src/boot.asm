@@ -24,7 +24,7 @@ entry_point:
 	ld [rNR52], a
 	ld [rLCDC], a
 
-	; Clear OAM
+	; Clear OAM and setup sprites
 	ld d, $a0
 	ld hl, $fe00
 	ld a, 0
@@ -51,6 +51,27 @@ clear_oam:
 	ld a, $40
 	ld [hli], a
 
+	; Clear RAM
+	ld d, $ff
+	ld hl, $c000
+	ld a, 0
+clear_ram:
+	ld [hli], a
+	dec d
+	jp nz, clear_ram
+
+	; clear_vram
+	ld de, $2000
+	ld hl, $8000
+clear_vram:
+	ld a, 0
+	ld [hli], a
+	inc bc
+	dec de
+	ld a, d
+	or a, e
+	jp nz, clear_vram
+
 	; Write tiles
 	ld bc, char_tiles
 	ld de, char_tiles.end - char_tiles
@@ -64,39 +85,24 @@ load_tiles:
 	or a, e
 	jp nz, load_tiles
 
-	ld bc, splash_tiles
-	ld de, splash_tiles.end - splash_tiles
-	ld hl, $8800
-load_tiles_window:
+	; Load game_list_loader to WRAM
+	ld bc, game_list_loader_ram
+	ld de, game_list_loader_ram.end - game_list_loader_ram
+	ld hl, $c200
+game_list_loader_loop:
 	ld a, [bc]
 	ld [hli], a
 	inc bc
 	dec de
 	ld a, d
 	or a, e
-	jp nz, load_tiles_window
-
-	ld bc, splash_tilemap
-	ld de, splash_tilemap.end - splash_tilemap
-	ld hl, $9c00
-load_tilemap_window:
-	ld a, [bc]
-	add $80
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, load_tilemap_window
+	jp nz, game_list_loader_loop
 
 	; Initialize registers
 	ld a, %11100100
 	ld [rBGP], a
 	ld [rOBP0], a
 	ld [rOBP1], a
-
-	ld a, 1
-	ld [rIE], a
 
 	ld a, 31
 	ld [rLYC], a
@@ -119,18 +125,17 @@ load_tilemap_window:
 	ld a, 0
 	ld [SELECTED_RTC], a
 
-	ld a, 2
-	ld [SPLASH_SCREEN], a
-
-	ld a, 127
-	ld [SPLASH_SCREEN_TIMER], a
-
 	ld a, 7
 	ld [rWX], a
 
 	; Turn PPU on
-	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_BG8000 | LCDCF_WINON | LCDCF_WIN9C00
+	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_BG8000
 	ld [rLCDC], a
+
+	ld a, 0
+	ld [rIF], a
+	ld a, 1
+	ld [rIE], a
 
 	ei
 	nop

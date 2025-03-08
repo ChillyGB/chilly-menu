@@ -1,20 +1,5 @@
 vblank_interrupt:
     di
-    ld hl, SPLASH_SCREEN
-    ld a, [hl]
-    and a
-    jp z, no_splash
-    ld hl, SPLASH_SCREEN_TIMER
-    dec [hl]
-    jp z, disable_splash
-    reti
-disable_splash:
-    ld hl, SPLASH_SCREEN
-    ld [hl], 0
-    ld hl, rLCDC
-    res 5, [hl]
-    reti
-no_splash:
 	call update_keys
 	call handle_input
     call update_menu
