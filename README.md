@@ -9,10 +9,7 @@ A simple menu for ChillyCart
 - [x] Game loader
 - [x] Basic splash screen
 - [x] RTC entry
-- [ ] Animated splash
-- [ ] Snow background
-- [ ] Sounds
-- [ ] Font selection
-- [ ] Save backup on boot
 - [ ] GameGenie
 - [ ] GameShark
+- [ ] Sounds
+- [ ] Font selection
