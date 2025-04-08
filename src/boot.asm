@@ -36,7 +36,7 @@ clear_oam:
 	ld hl, $fe00
 	ld a, 32
 	ld [hli], a
-	ld a, 12
+	ld a, 52
 	ld [hli], a
 	ld a, 1
 	ld [hli], a
@@ -44,7 +44,7 @@ clear_oam:
 	ld [hli], a
 	ld a, 48
 	ld [hli], a
-	ld a, 12
+	ld a, 52
 	ld [hli], a
 	ld a, 1
 	ld [hli], a
@@ -156,14 +156,6 @@ wait_vblank_internal:
 
 char_tiles::
 	INCBIN "inc/img/chars.2bpp"
-.end:
-
-splash_tiles::
-	INCBIN "inc/img/splash_tiles.2bpp"
-.end:
-
-splash_tilemap::
-	INCBIN "inc/img/splash_tilemap.2bpp"
 .end:
 
 INCLUDE "inc/addresses.inc"

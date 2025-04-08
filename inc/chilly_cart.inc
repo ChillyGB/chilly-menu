@@ -58,14 +58,14 @@ loop_clear_vram:
 write_time:
 	; Write separators
 	ld a, "/"
-	ld hl, $9862
+	ld hl, $9867
 	ld [hl], a
 	inc hl
 	inc hl
 	inc hl
 	ld [hl], a
 	ld a, ":"
-	ld hl, $98a2
+	ld hl, $98a8
 	ld [hl], a
 	inc hl
 	inc hl
@@ -74,32 +74,32 @@ write_time:
 
 	; Write date
 	ld a, [rDAY]
-	ld hl, $9860
+	ld hl, $9865
 	call num_to_ascii_10
 
 	ld a, [rMONTH]
-	ld hl, $9863
+	ld hl, $9868
 	call num_to_ascii_10
 
 	ld a, 20
-	ld hl, $9866
+	ld hl, $986b
 	call num_to_ascii_10
 
 	ld a, [rYEAR]
-	ld hl, $9868
+	ld hl, $986d
 	call num_to_ascii_10
 
 	; Write time
 	ld a, [rHOURS]
-	ld hl, $98a0
+	ld hl, $98a6
 	call num_to_ascii_10
 
 	ld a, [rMINUTES]
-	ld hl, $98a3
+	ld hl, $98a9
 	call num_to_ascii_10
 
 	ld a, [rSECONDS]
-	ld hl, $98a6
+	ld hl, $98ac
 	call num_to_ascii_10
 
 	ret
@@ -167,12 +167,12 @@ loop_load_pages_text:
 	ld hl, CURRENT_PAGE
 	ld b, [hl]
 	inc b
-	ld hl, $9a27
+	ld hl, $9a2a
 	call num_to_ascii
 
 	ld hl, rCOPYFILELIST
 	ld b, [hl]
-	ld hl, $9a2b
+	ld hl, $9a2e
 	call num_to_ascii
 
 	jp load_current_view_end
@@ -190,6 +190,16 @@ loop_load_text_title_2:
 	inc bc
 	dec d
 	jp nz, loop_load_text_title_2
+
+	ld bc, menu_text_timezone
+	ld d, menu_text_timezone.end - menu_text_timezone
+	ld hl, $99e0
+loop_load_text_timezone:
+	ld a, [bc]
+	ld [hli], a
+	inc bc
+	dec d
+	jp nz, loop_load_text_timezone
 
 	ld hl, $a004
 	ld [hl], 0
@@ -270,67 +280,67 @@ move_to_day:
 	ld hl, $fe00
 	ld [hl], 32
 	inc hl
-	ld [hl], 12
+	ld [hl], 52
 
 	ld hl, $fe04
 	ld [hl], 48
 	inc hl
-	ld [hl], 12
+	ld [hl], 52
 	jp move_end
 move_to_month:
 	ld hl, $fe00
 	ld [hl], 32
 	inc hl
-	ld [hl], 36
+	ld [hl], 76
 
 	ld hl, $fe04
 	ld [hl], 48
 	inc hl
-	ld [hl], 36
+	ld [hl], 76
 	jp move_end
 move_to_year:
 	ld hl, $fe00
 	ld [hl], 32
 	inc hl
-	ld [hl], 76
+	ld [hl], 116
 
 	ld hl, $fe04
 	ld [hl], 48
 	inc hl
-	ld [hl], 76
+	ld [hl], 116
 	jp move_end
 move_to_hours:
 	ld hl, $fe00
 	ld [hl], 48
 	inc hl
-	ld [hl], 12
+	ld [hl], 60
 
 	ld hl, $fe04
 	ld [hl], 64
 	inc hl
-	ld [hl], 12
+	ld [hl], 60
 	jp move_end
 move_to_minutes:
 	ld hl, $fe00
 	ld [hl], 48
 	inc hl
-	ld [hl], 36
+	ld [hl], 84
 
 	ld hl, $fe04
 	ld [hl], 64
 	inc hl
-	ld [hl], 36
+	ld [hl], 84
 	jp move_end
 move_to_seconds:
 	ld hl, $fe00
 	ld [hl], 48
 	inc hl
-	ld [hl], 60
+	ld [hl], 108
 
 	ld hl, $fe04
 	ld [hl], 64
 	inc hl
-	ld [hl], 60
+	ld [hl], 108
 	jp move_end
 move_end:
 	call write_time
@@ -374,15 +384,15 @@ game_list_loader_ram::
 .end:
 
 menu_text_title_1::
-	db "Files   "
+	db "    File manager"
 .end:
 
 menu_text_title_2::
-	db "RTC     "
+	db "    RTC Settings"
 .end:
 
 menu_text_title_3::
-	db "About   "
+	db "        Info"
 .end:
 
 menu_text_about::
@@ -405,5 +415,9 @@ menu_text_about::
 .end:
 
 menu_text_pages::
-	db "Pages:    /"
+	db "   Pages:    /"
+.end:
+
+menu_text_timezone::
+	db " Time zone is UTC+0"
 .end:
