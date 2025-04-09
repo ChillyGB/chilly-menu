@@ -85,6 +85,19 @@ load_tiles:
 	or a, e
 	jp nz, load_tiles
 
+	; Write tiles
+	ld bc, qr_tiles
+	ld de, qr_tiles.end - qr_tiles
+	ld hl, $8800
+load_qr_tiles:
+	ld a, [bc]
+	ld [hli], a
+	inc bc
+	dec de
+	ld a, d
+	or a, e
+	jp nz, load_qr_tiles
+
 	; Load game_list_loader to WRAM
 	ld bc, game_list_loader_ram
 	ld de, game_list_loader_ram.end - game_list_loader_ram
@@ -158,8 +171,11 @@ char_tiles::
 	INCBIN "inc/img/chars.2bpp"
 .end:
 
+qr_tiles::
+	INCBIN "inc/img/qr_code_tiles.2bpp"
+.end:
+
 INCLUDE "inc/addresses.inc"
 INCLUDE "inc/interrupts.inc"
 INCLUDE "inc/chilly_cart.inc"
-INCLUDE "inc/splash.inc"
 INCLUDE "inc/input.inc"

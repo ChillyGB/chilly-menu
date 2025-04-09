@@ -1,2 +1,0 @@
-handle_splash:
-    ret
