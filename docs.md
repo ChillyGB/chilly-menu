@@ -1,6 +1,6 @@
 # Chillycart mapper
 
-ROM size is 64KB
+max ROM size is 64KB
 
 ## Memory
 
@@ -28,14 +28,7 @@ it will read 0 if the current selection is a gb or gbc file
 it will read 1 if the current selection is a directory
 it will read 0xff if the current selection is not a valid rom
 
-WARNING: Write to this register can clear the rom content. Always check if the current selection is a directory or a file before writing 0x0 here. If the selected item is file disable interrupts and execute code from WRAM or HRAM
-
-### A001 Save copy to SD card (Read/Write)
-
-Reads $0 when Save content was copied to SD card at least one time
-Reads $1 when Save content was not copied to SD card
-Reads $FF when Save is backupping
-Writing any values will start the current save to SD card
+WARNING: Write to this register can clear the ROM content. Always check if the current selection is a directory or a file before writing 0x0 here. If the selected item is file disable interrupts and execute code from WRAM or HRAM
 
 ### A002 Copy file list (Read/Write)
 
@@ -50,20 +43,24 @@ Writing any values to this address will copy the current RTC time to A010-A015
 
 ### A005 Save RTC (Write Only)
 
-Writing any values to this address will copy the RTC values to RTC
+Writing any values to this address will copy the RTC values from A010-A015 to RTC
 
 ### A010-A015 RTC Registers (Read/Write)
 
-**A010:** Year
-**A011:** Month
-**A012:** Day
-**A013:** Hours
-**A014:** Minutes
-**A015:** Seconds
+- **A010:** Year
+- **A011:** Month
+- **A012:** Day
+- **A013:** Hours
+- **A014:** Minutes
+- **A015:** Seconds
 
-### A100 Current ROM selection (Read/Write)
+### A100 Current file selection (Read/Write)
 
-index of the current rom in the current page
+Index of the current selected file (or directory) in the current page
+
+### A200-A213 Firmware string (Read Only)
+
+A 20 chars string formatted in ascii that can be used to get the firmware version
 
 ### B000-B1BF File list (Read Only)
 
