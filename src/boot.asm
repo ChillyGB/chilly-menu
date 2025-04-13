@@ -34,21 +34,13 @@ clear_oam:
 	jp nz, clear_oam
 
 	ld hl, $fe00
-	ld a, 32
+	ld a, 36
 	ld [hli], a
 	ld a, 52
 	ld [hli], a
-	ld a, 1
+	ld a, 2
 	ld [hli], a
 	ld a, 0
-	ld [hli], a
-	ld a, 48
-	ld [hli], a
-	ld a, 52
-	ld [hli], a
-	ld a, 1
-	ld [hli], a
-	ld a, $40
 	ld [hli], a
 
 	; Clear RAM
@@ -142,7 +134,7 @@ game_list_loader_loop:
 	ld [rWX], a
 
 	; Turn PPU on
-	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_BG8000
+	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_BG8000 | LCDCF_OBJ16
 	ld [rLCDC], a
 
 	ld a, 0

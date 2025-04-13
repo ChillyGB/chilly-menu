@@ -289,67 +289,37 @@ update_rtc:
 	jp move_end
 move_to_day:
 	ld hl, $fe00
-	ld [hl], 32
-	inc hl
-	ld [hl], 52
-
-	ld hl, $fe04
-	ld [hl], 48
+	ld [hl], 36
 	inc hl
 	ld [hl], 52
 	jp move_end
 move_to_month:
 	ld hl, $fe00
-	ld [hl], 32
-	inc hl
-	ld [hl], 76
-
-	ld hl, $fe04
-	ld [hl], 48
+	ld [hl], 36
 	inc hl
 	ld [hl], 76
 	jp move_end
 move_to_year:
 	ld hl, $fe00
-	ld [hl], 32
-	inc hl
-	ld [hl], 116
-
-	ld hl, $fe04
-	ld [hl], 48
+	ld [hl], 36
 	inc hl
 	ld [hl], 116
 	jp move_end
 move_to_hours:
 	ld hl, $fe00
-	ld [hl], 48
-	inc hl
-	ld [hl], 60
-
-	ld hl, $fe04
-	ld [hl], 64
+	ld [hl], 52
 	inc hl
 	ld [hl], 60
 	jp move_end
 move_to_minutes:
 	ld hl, $fe00
-	ld [hl], 48
-	inc hl
-	ld [hl], 84
-
-	ld hl, $fe04
-	ld [hl], 64
+	ld [hl], 52
 	inc hl
 	ld [hl], 84
 	jp move_end
 move_to_seconds:
 	ld hl, $fe00
-	ld [hl], 48
-	inc hl
-	ld [hl], 108
-
-	ld hl, $fe04
-	ld [hl], 64
+	ld [hl], 52
 	inc hl
 	ld [hl], 108
 	jp move_end
@@ -358,6 +328,45 @@ move_end:
 	ret
 
 game_loader:
+	di
+
+	call wait_vblank
+	ld bc, menu_text_loading1
+	ld de, menu_text_loading1.end - menu_text_loading1
+	ld hl, $98e2
+load_game_loading_1:
+	ld a, [bc]
+	ld [hli], a
+	inc bc
+	dec de
+	ld a, d
+	or a, e
+	jp nz, load_game_loading_1
+
+	ld bc, menu_text_loading2
+	ld de, menu_text_loading2.end - menu_text_loading2
+	ld hl, $9902
+load_game_loading_2:
+	ld a, [bc]
+	ld [hli], a
+	inc bc
+	dec de
+	ld a, d
+	or a, e
+	jp nz, load_game_loading_2
+
+	ld bc, menu_text_loading3
+	ld de, menu_text_loading3.end - menu_text_loading3
+	ld hl, $9922
+load_game_loading_3:
+	ld a, [bc]
+	ld [hli], a
+	inc bc
+	dec de
+	ld a, d
+	or a, e
+	jp nz, load_game_loading_3
+
 	ld bc, game_loader_ram
 	ld de, game_loader_ram.end - game_loader_ram
 	ld hl, $c200
@@ -372,7 +381,6 @@ game_loader_loop:
 	jp $c200
 
 game_loader_ram::
-	di
 	ld hl, rLOAD_SELECTED
 	ld [hl], 0
 .waiting_for_game
@@ -404,6 +412,18 @@ menu_text_title_2::
 
 menu_text_title_3::
 	db "        Info"
+.end:
+
+menu_text_loading1::
+	db 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6
+.end:
+
+menu_text_loading2::
+	db 10, "  Loading...  ", 11
+.end:
+
+menu_text_loading3::
+	db 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9
 .end:
 
 menu_text_about::
