@@ -201,6 +201,23 @@ loop_load_text_timezone:
 	dec d
 	jp nz, loop_load_text_timezone
 
+	ld hl, RTC_WAS_SAVED
+	ld a, [hl]
+	and a
+	jp z, skip_time_saved_text
+
+	ld [hl], 0
+	ld bc, menu_text_rtc_saved
+	ld d, menu_text_rtc_saved.end - menu_text_rtc_saved
+	ld hl, $9905
+loop_load_text_rtc_saved:
+	ld a, [bc]
+	ld [hli], a
+	inc bc
+	dec d
+	jp nz, loop_load_text_rtc_saved
+skip_time_saved_text:
+
 	ld hl, $a004
 	ld [hl], 0
 	call write_time
@@ -447,6 +464,10 @@ menu_text_about::
 
 menu_text_pages::
 	db "   Pages:    /"
+.end:
+
+menu_text_rtc_saved::
+	db "Time Saved"
 .end:
 
 menu_text_timezone::

@@ -137,6 +137,12 @@ open_selected:
     ret
 
 disable_rtc_edit:
+    ld hl, RTC_EDIT_MODE
+    ld a, [hl]
+    and a
+    ret z
+    ld hl, NEED_UPDATE
+    ld [hl], 1
     ld hl, rLCDC
     res 1, [hl]
     ld hl, RTC_EDIT_MODE
@@ -144,6 +150,12 @@ disable_rtc_edit:
     ret
 
 enable_rtc_edit:
+    ld hl, RTC_EDIT_MODE
+    ld a, [hl]
+    and a
+    ret nz
+    ld hl, NEED_UPDATE
+    ld [hl], 1
     ld hl, rLCDC
     set 1, [hl]
     ld hl, RTC_EDIT_MODE
@@ -224,7 +236,14 @@ rtc_case_5:
     ret
 
 save_rtc:
+    ld hl, RTC_EDIT_MODE
+    ld a, [hl]
+    and a
+    ret z
+    call disable_rtc_edit
     ld hl, NEED_UPDATE
+    ld [hl], 1
+    ld hl, RTC_WAS_SAVED
     ld [hl], 1
     ld hl, rRTC_SAVE
     ld [hl], 1
