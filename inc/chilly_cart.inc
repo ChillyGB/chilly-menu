@@ -166,6 +166,9 @@ load_menu_rtc:
 	jp z, skip_time_saved_text
 
 	ld [hl], 0
+	memcpy $98e2, frame_top, frame_top.end - frame_top
+	memcpy $9902, frame_mid, frame_mid.end - frame_mid
+	memcpy $9922, frame_bottom, frame_bottom.end - frame_bottom
 	memcpy $9905, menu_text_rtc_saved, menu_text_rtc_saved.end - menu_text_rtc_saved
 skip_time_saved_text:
 
@@ -255,9 +258,10 @@ move_end:
 game_loader:
 	di
 	wait_vblank
-	memcpy $98e2, menu_text_loading1, menu_text_loading1.end - menu_text_loading1
-	memcpy $9902, menu_text_loading2, menu_text_loading2.end - menu_text_loading2
-	memcpy $9922, menu_text_loading3, menu_text_loading3.end - menu_text_loading3
+	memcpy $98e2, frame_top, frame_top.end - frame_top
+	memcpy $9902, frame_mid, frame_mid.end - frame_mid
+	memcpy $9922, frame_bottom, frame_bottom.end - frame_bottom
+	memcpy $9905, menu_text_loading, menu_text_loading.end - menu_text_loading
 	memcpy $c300, game_loader_ram, game_loader_ram.end - game_loader_ram
 	jp $c300
 
@@ -295,16 +299,20 @@ menu_text_title_3::
 	db "        Info"
 .end:
 
-menu_text_loading1::
+frame_top::
 	db 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6
 .end:
 
-menu_text_loading2::
-	db 10, "  Loading...  ", 11
+frame_mid::
+	db 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11
 .end:
 
-menu_text_loading3::
+frame_bottom::
 	db 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9
+.end:
+
+menu_text_loading:
+	db "Loading..."
 .end:
 
 menu_text_about::
