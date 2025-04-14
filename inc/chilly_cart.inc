@@ -43,17 +43,6 @@ final_num_10:
 	ld [hl], a
 	ret
 
-clear_tilemap:
-	ld hl, $9800
-	ld bc, $9c00 - $9800
-loop_clear_vram:
-	ld a, 0
-	ld [hli], a
-	dec bc
-	ld a, b
-	or a, c
-	jp nz, loop_clear_vram
-	ret
 
 write_time:
 	; Write separators
@@ -113,7 +102,7 @@ update_menu:
 	ld [hl], 0
 
 	; Wait for vblank for turning PPU off
-	call wait_vblank
+	wait_vblank
 	ld hl, rLCDC
 	res 7, [hl]
 
@@ -128,7 +117,7 @@ update_menu:
 	ret
 
 load_current_view:
-	call clear_tilemap
+	memset $9800, $9c00 - $9800, 0
 	ld hl, MENU_ENTRY
 	ld a, [hl]
 	cp 0
@@ -142,27 +131,13 @@ load_menu_roms:
 	ld hl, rIE
 	set 1, [hl]
 
-	call load_current_page_to_vram
+	call $c200
+	; Write game list to VRAM
+	memcpy $9840, $b000, $1c0
 
-	ld bc, menu_text_title_1
-	ld d, menu_text_title_1.end - menu_text_title_1
-	ld hl, $9800
-loop_load_text_title_1:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec d
-	jp nz, loop_load_text_title_1
+	memcpy $9800, menu_text_title_1, menu_text_title_1.end - menu_text_title_1
 
-	ld bc, menu_text_pages
-	ld d, menu_text_pages.end - menu_text_pages
-	ld hl, $9a20
-loop_load_pages_text:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec d
-	jp nz, loop_load_pages_text
+	memcpy $9a20, menu_text_pages, menu_text_pages.end - menu_text_pages
 
 	ld hl, CURRENT_PAGE
 	ld b, [hl]
@@ -181,25 +156,9 @@ load_menu_rtc:
 	ld hl, rIE
 	res 1, [hl]
 
-	ld bc, menu_text_title_2
-	ld d, menu_text_title_2.end - menu_text_title_2
-	ld hl, $9800
-loop_load_text_title_2:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec d
-	jp nz, loop_load_text_title_2
+	memcpy $9800, menu_text_title_2, menu_text_title_2.end - menu_text_title_2
 
-	ld bc, menu_text_timezone
-	ld d, menu_text_timezone.end - menu_text_timezone
-	ld hl, $99e0
-loop_load_text_timezone:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec d
-	jp nz, loop_load_text_timezone
+	memcpy $99e0, menu_text_timezone, menu_text_timezone.end - menu_text_timezone
 
 	ld hl, RTC_WAS_SAVED
 	ld a, [hl]
@@ -207,15 +166,7 @@ loop_load_text_timezone:
 	jp z, skip_time_saved_text
 
 	ld [hl], 0
-	ld bc, menu_text_rtc_saved
-	ld d, menu_text_rtc_saved.end - menu_text_rtc_saved
-	ld hl, $9905
-loop_load_text_rtc_saved:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec d
-	jp nz, loop_load_text_rtc_saved
+	memcpy $9905, menu_text_rtc_saved, menu_text_rtc_saved.end - menu_text_rtc_saved
 skip_time_saved_text:
 
 	ld hl, $a004
@@ -228,59 +179,16 @@ load_menu_about:
 	ld hl, rIE
 	res 1, [hl]
 
-	ld bc, menu_text_title_3
-	ld d, menu_text_title_3.end - menu_text_title_3
-	ld hl, $9800
-loop_load_text_title_3:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec d
-	jp nz, loop_load_text_title_3
+	memcpy $9800, menu_text_title_3, menu_text_title_3.end - menu_text_title_3
 
-	ld bc, menu_text_about
-	ld de, menu_text_about.end - menu_text_about
-	ld hl, $9840
-loop_about_text:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or e
-	jp nz, loop_about_text
+	memcpy $9840, menu_text_about, menu_text_about.end - menu_text_about
 
 	; Write firmware version
-	ld bc, $a200
-	ld d, 20
-	ld hl, $9a00
-loop_firmware_text:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec d
-	jp nz, loop_firmware_text
+	memcpy $9a00, $a200, 20
 
 	jp load_current_view_end
 load_current_view_end:
 	ret
-
-load_current_page_to_vram:
-	call $c200
-
-	; Write game list to VRAM
-	ld bc, $b000
-	ld de, $1c0
-	ld hl, $9840
-game_list:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, game_list
-    ret
 
 update_rtc:
 	ld hl, NEED_RTC_UPDATE
@@ -346,56 +254,12 @@ move_end:
 
 game_loader:
 	di
-
-	call wait_vblank
-	ld bc, menu_text_loading1
-	ld de, menu_text_loading1.end - menu_text_loading1
-	ld hl, $98e2
-load_game_loading_1:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, load_game_loading_1
-
-	ld bc, menu_text_loading2
-	ld de, menu_text_loading2.end - menu_text_loading2
-	ld hl, $9902
-load_game_loading_2:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, load_game_loading_2
-
-	ld bc, menu_text_loading3
-	ld de, menu_text_loading3.end - menu_text_loading3
-	ld hl, $9922
-load_game_loading_3:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, load_game_loading_3
-
-	ld bc, game_loader_ram
-	ld de, game_loader_ram.end - game_loader_ram
-	ld hl, $c200
-game_loader_loop:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, game_loader_loop
-	jp $c200
+	wait_vblank
+	memcpy $98e2, menu_text_loading1, menu_text_loading1.end - menu_text_loading1
+	memcpy $9902, menu_text_loading2, menu_text_loading2.end - menu_text_loading2
+	memcpy $9922, menu_text_loading3, menu_text_loading3.end - menu_text_loading3
+	memcpy $c300, game_loader_ram, game_loader_ram.end - game_loader_ram
+	jp $c300
 
 game_loader_ram::
 	ld hl, rLOAD_SELECTED

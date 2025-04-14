@@ -1,4 +1,5 @@
 INCLUDE "inc/hardware.inc"
+INCLUDE "inc/macros.inc"
 INCLUDE "inc/text-macros.inc"
 
 SECTION "VBI", ROM0[$40]
@@ -19,19 +20,13 @@ entry_point:
 	ld sp, $dfff
 
 	; Turn PPU and APU off
-	call wait_vblank
+	wait_vblank
 	ld a, 0
 	ld [rNR52], a
 	ld [rLCDC], a
 
 	; Clear OAM and setup sprites
-	ld d, $a0
-	ld hl, $fe00
-	ld a, 0
-clear_oam:
-	ld [hli], a
-	dec d
-	jp nz, clear_oam
+	memset $fe00, $00a0, 0
 
 	ld hl, $fe00
 	ld a, 36
@@ -44,64 +39,15 @@ clear_oam:
 	ld [hli], a
 
 	; Clear RAM
-	ld d, $ff
-	ld hl, $c000
-	ld a, 0
-clear_ram:
-	ld [hli], a
-	dec d
-	jp nz, clear_ram
-
+	memset $c000, $00ff, 0
 	; clear_vram
-	ld de, $2000
-	ld hl, $8000
-clear_vram:
-	ld a, 0
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, clear_vram
-
+	memset $8000, $2000, 0
 	; Write tiles
-	ld bc, char_tiles
-	ld de, char_tiles.end - char_tiles
-	ld hl, $8000
-load_tiles:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, load_tiles
-
-	; Write tiles
-	ld bc, qr_tiles
-	ld de, qr_tiles.end - qr_tiles
-	ld hl, $8800
-load_qr_tiles:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, load_qr_tiles
-
+	memcpy $8000, char_tiles, char_tiles.end - char_tiles
+	; Write qr tiles
+	memcpy $8800, qr_tiles, qr_tiles.end - qr_tiles
 	; Load game_list_loader to WRAM
-	ld bc, game_list_loader_ram
-	ld de, game_list_loader_ram.end - game_list_loader_ram
-	ld hl, $c200
-game_list_loader_loop:
-	ld a, [bc]
-	ld [hli], a
-	inc bc
-	dec de
-	ld a, d
-	or a, e
-	jp nz, game_list_loader_loop
+	memcpy $c200, game_list_loader_ram, game_list_loader_ram.end - game_list_loader_ram
 
 	; Initialize registers
 	ld a, %11100100
@@ -149,15 +95,6 @@ main_loop:
 	halt
 	nop
 	jr main_loop
-
-wait_vblank:
-	push af
-wait_vblank_internal:
-	ld a, [rLY]
-	cp 144
-	jr c, wait_vblank_internal
-	pop af
-	ret
 
 char_tiles::
 	INCBIN "inc/img/chars.2bpp"
