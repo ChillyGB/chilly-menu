@@ -21,6 +21,17 @@ MACRO memcpy
 	jr nz, .loop\@
 ENDM
 
+MACRO memcpy_8
+	ld hl, \1
+	ld bc, \2
+	ld d, \3
+.loop\@
+	ld a, [bc]
+	ld [hli], a
+	inc bc
+	dec d
+	jr nz, .loop\@
+ENDM
 
 MACRO memset
 	ld hl, \1
@@ -32,5 +43,18 @@ MACRO memset
 	dec de
 	ld a, d
 	or a, e
+	jr nz, .loop\@
+ENDM
+
+MACRO memcpy_inc
+	ld hl, \1
+	ld bc, \2
+	ld d, \3
+.loop\@
+	ld a, [bc]
+	inc a
+	ld [hli], a
+	inc bc
+	dec d
 	jr nz, .loop\@
 ENDM

@@ -44,6 +44,9 @@ entry_point:
 	memset $8000, $2000, 0
 	; Write tiles
 	memcpy $8000, char_tiles, char_tiles.end - char_tiles
+	memcpy_8 $9010, char_tiles + $300, $a0
+	memcpy_8 $90c0, char_tiles + $410, $60
+	memcpy_8 $9110, char_tiles + $2d0, $10
 	; Write qr tiles
 	memcpy $8800, qr_tiles, qr_tiles.end - qr_tiles
 	; Load game_list_loader to WRAM

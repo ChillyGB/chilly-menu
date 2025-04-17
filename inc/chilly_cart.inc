@@ -126,6 +126,8 @@ load_current_view:
 	jp z, load_menu_rtc
 	cp 2
 	jp z, load_menu_about
+	cp 3
+	jp z, load_menu_cheats
 ; FILES ENTRY
 load_menu_roms:
 	ld hl, rIE
@@ -188,6 +190,24 @@ load_menu_about:
 
 	; Write firmware version
 	memcpy $9a00, $a200, 20
+
+	jp load_current_view_end
+; CHEATS ENTRY
+load_menu_cheats:
+	ld hl, rIE
+	res 1, [hl]
+
+	DEF x = 0
+	REPT 16
+		memcpy_inc $9820 + (x << 5), $a300 + (x * 9) , 3
+		ld hl, $9823 + (x << 5)
+		ld [hl], $11
+		memcpy_inc $9824 + (x << 5), $a303 + (x * 9) , 3
+		ld hl, $9827 + (x << 5)
+		ld [hl], $11
+		memcpy_inc $9828 + (x << 5), $a306 + (x * 9) , 3
+		DEF x += 1
+	ENDR
 
 	jp load_current_view_end
 load_current_view_end:

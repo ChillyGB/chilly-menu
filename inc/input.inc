@@ -249,12 +249,39 @@ save_rtc:
     ld [hl], 1
     ret
 
+open_cheats:
+    ld hl, NEED_UPDATE
+    ld [hl], 1
+    ld hl, rCHEATS_LOAD
+    ld [hl], a
+    ld hl, MENU_ENTRY
+    ld [hl], 3
+    ld hl, rSCX
+    ld [hl], 220
+    ld hl, rLCDC
+    res 4, [hl]
+    ret
+
+save_cheats:
+close_cheats:
+    ld hl, NEED_UPDATE
+    ld [hl], 1
+    ld hl, MENU_ENTRY
+    ld [hl], 0
+    ld hl, rSCX
+    ld [hl], 0
+    ld hl, rLCDC
+    set 4, [hl]
+    ret
+
 handle_input:
     ld a, [wNEW_KEYS]
     and a, PADF_SELECT
     jp z, check_next
     ld hl, MENU_ENTRY
     ld a, [hl]
+    cp 3
+    jp z, check_next
     inc a
     cp 3
     jp c, skip_entry_fix
@@ -274,8 +301,9 @@ check_next:
 	jp z, input_files
 	cp 1
 	jp z, input_rtc
-	cp 2
-	jp z, input_handle_end
+	cp 3
+	jp z, input_cheats
+	jp input_handle_end
 ; Input when in Files menu
 input_files:
 check_up_files:
@@ -306,8 +334,13 @@ check_b_files:
 check_a_files:
     ld a, [wNEW_KEYS]
     and a, PADF_A
-    jp z, input_handle_end
+    jp z, check_start_files
     call open_selected
+check_start_files:
+    ld a, [wNEW_KEYS]
+    and a, PADF_START
+    jp z, input_handle_end
+    call open_cheats
     jp input_handle_end
 ; Input when in RTC menu
 input_rtc:
@@ -359,5 +392,16 @@ check_start_rtc:
     jp z, input_handle_end
     call save_rtc
     jp input_handle_end
+input_cheats:
+check_start_cheats:
+    ld a, [wNEW_KEYS]
+    and a, PADF_START
+    jp z, check_b_cheats
+    call save_cheats
+check_b_cheats:
+    ld a, [wNEW_KEYS]
+    and a, PADF_B
+    jp z, input_handle_end
+    call close_cheats
 input_handle_end:
     ret

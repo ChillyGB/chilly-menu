@@ -45,6 +45,14 @@ Writing any values to this address will copy the current RTC time to A010-A015
 
 Writing any values to this address will copy the RTC values from A010-A015 to RTC
 
+### A006 Load Cheats (Write Only)
+
+Writing any values to this address will copy the cheats code of the current selected game to A300-A390
+
+### A007 Save Cheats (Write Only)
+
+Writing any values to this address will copy the cheats code from A300-A390 to SD Cart
+
 ### A010-A015 RTC Registers (Read/Write)
 
 - **A010:** Year
@@ -61,6 +69,10 @@ Index of the current selected file (or directory) in the current page
 ### A200-A213 Firmware string (Read Only)
 
 A 20 chars string formatted in ascii that can be used to get the firmware version
+
+### A300-A390 File list (Read/Write)
+
+Contains a list of 16 cheats codes. The cheats are gamegenie codes. A cheat is represented by a 9 values. Every value is a digit of the gameshark code
 
 ### B000-B1BF File list (Read Only)
 
