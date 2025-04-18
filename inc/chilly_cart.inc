@@ -275,6 +275,33 @@ move_end:
 	call write_time
 	ret
 
+update_cheats:
+	ld hl, NEED_CHEATS_UPDATE
+	ld a, [hl]
+	and a
+	ret z
+	ld [hl], 0
+
+	ld hl, SELECTED_CHEAT
+	ld a, [hl]
+	sla a
+	sla a
+	sla a
+	add a, 24
+	ld [$fe04], a
+	ld [$fe08], a
+	ld [$fe0c], a
+
+	ld hl, SELECTED_CHEAT_NUM
+	ld a, [hl]
+	sla a
+	sla a
+	sla a
+	add a, 44
+	ld [$fe0d], a
+
+	ret
+
 game_loader:
 	di
 	wait_vblank

@@ -58,3 +58,16 @@ MACRO memcpy_inc
 	dec d
 	jr nz, .loop\@
 ENDM
+
+MACRO memcpy_dec
+	ld hl, \1
+	ld bc, \2
+	ld d, \3
+.loop\@
+	ld a, [bc]
+	dec a
+	ld [hli], a
+	inc bc
+	dec d
+	jr nz, .loop\@
+ENDM

@@ -3,6 +3,7 @@
 mkdir -p "build/obj"
 
 rgbgfx -o ./inc/img/chars.2bpp ./inc/img/chars.png
+rgbgfx -o ./inc/img/cheat_chars.2bpp ./inc/img/cheat_chars.png
 rgbgfx -o ./inc/img/qr_code_tiles.2bpp ./inc/img/qr_code.png
 
 function build_rom () {

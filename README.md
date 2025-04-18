@@ -19,7 +19,7 @@ If you want to implement the menu on your emulator or on a flashcard firmware, y
 - [x] Game loader
 - [x] Basic splash screen
 - [x] RTC entry
-- [ ] GameGenie
+- [x] GameGenie
 - [ ] GameShark
 - [ ] Sounds
 - [ ] Font selection

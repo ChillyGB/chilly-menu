@@ -4,6 +4,7 @@ vblank_interrupt:
 	call handle_input
     call update_menu
     call update_rtc
+    call update_cheats
     reti
 
 stat_interrupt:

@@ -29,7 +29,7 @@ entry_point:
 	memset $fe00, $00a0, 0
 
 	ld hl, $fe00
-	ld a, 36
+	ld a, 0
 	ld [hli], a
 	ld a, 52
 	ld [hli], a
@@ -38,15 +38,40 @@ entry_point:
 	ld a, 0
 	ld [hli], a
 
+	ld a, 0
+	ld [hli], a
+	ld a, 36
+	ld [hli], a
+	ld a, 12
+	ld [hli], a
+	ld a, $20
+	ld [hli], a
+
+	ld a, 0
+	ld [hli], a
+	ld a, 132
+	ld [hli], a
+	ld a, 12
+	ld [hli], a
+	ld a, 0
+
+	ld [hli], a
+	ld a, 0
+	ld [hli], a
+	ld a, 44
+	ld [hli], a
+	ld a, 1
+	ld [hli], a
+	ld a, $80
+	ld [hli], a
+
 	; Clear RAM
 	memset $c000, $00ff, 0
 	; clear_vram
 	memset $8000, $2000, 0
 	; Write tiles
 	memcpy $8000, char_tiles, char_tiles.end - char_tiles
-	memcpy_8 $9010, char_tiles + $300, $a0
-	memcpy_8 $90c0, char_tiles + $410, $60
-	memcpy_8 $9110, char_tiles + $2d0, $10
+	memcpy $9000, cheat_char_tiles, cheat_char_tiles.end - cheat_char_tiles
 	; Write qr tiles
 	memcpy $8800, qr_tiles, qr_tiles.end - qr_tiles
 	; Load game_list_loader to WRAM
@@ -101,6 +126,10 @@ main_loop:
 
 char_tiles::
 	INCBIN "inc/img/chars.2bpp"
+.end:
+
+cheat_char_tiles::
+	INCBIN "inc/img/cheat_chars.2bpp"
 .end:
 
 qr_tiles::
