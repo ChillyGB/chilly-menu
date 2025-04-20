@@ -71,3 +71,19 @@ MACRO memcpy_dec
 	dec d
 	jr nz, .loop\@
 ENDM
+
+MACRO set_palette_bg
+	ld hl, rBCPS
+	ld [hl], $80 + (\4 << 1)
+	ld hl, rBCPD
+	ld [hl], ((((\2 >> 3) << 5) & $e0) | (\1 >> 3))
+	ld [hl], ((\2 >> 6) | ((\3 >> 3) << 2))
+ENDM
+
+MACRO set_palette_obj
+	ld hl, rOCPS
+	ld [hl], $80 + (\4 << 1)
+	ld hl, rOCPD
+	ld [hl], ((((\2 >> 3) << 5) & $e0) | (\1 >> 3))
+	ld [hl], ((\2 >> 6) | ((\3 >> 3) << 2))
+ENDM
