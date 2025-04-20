@@ -201,13 +201,23 @@ load_menu_cheats:
 	REPT 16
 		memcpy_inc $9820 + (x << 5), $a300 + (x * 9) , 3
 		ld hl, $9823 + (x << 5)
-		ld [hl], $11
+		ld [hl], $12
 		memcpy_inc $9824 + (x << 5), $a303 + (x * 9) , 3
 		ld hl, $9827 + (x << 5)
-		ld [hl], $11
+		ld [hl], $12
 		memcpy_inc $9828 + (x << 5), $a306 + (x * 9) , 3
 		DEF x += 1
 	ENDR
+
+	ld hl, SELECTED_CHEAT
+	ld a, [hl]
+	sla a
+	sla a
+	sla a
+	add a, 24
+	ld [$fe04], a
+	ld [$fe08], a
+	ld [$fe0c], a
 
 	jp load_current_view_end
 load_current_view_end:

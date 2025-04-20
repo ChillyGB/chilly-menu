@@ -267,12 +267,17 @@ open_cheats:
     ld a, [hl]
     and a
     ret nz
+
     ld hl, NEED_UPDATE
     ld [hl], 1
     ld hl, NEED_CHEATS_UPDATE
     ld [hl], 1
     ld hl, rCHEATS_LOAD
     ld [hl], a
+	ld hl, SELECTED_CHEAT
+	ld [hl], 0
+	ld hl, SELECTED_CHEAT_NUM
+	ld [hl], 0
     ld hl, MENU_ENTRY
     ld [hl], 3
     ld hl, rSCX
@@ -435,7 +440,7 @@ skip_add_1_1:
     ld a, [hl]
     and a
     ret nz
-    ld [hl], $10
+    ld [hl], $11
     ret
 
 increment_cheat_num:
@@ -455,7 +460,7 @@ skip_add_1:
     add hl, bc
     inc [hl]
     ld a, [hl]
-    cp $11
+    cp $12
     ret nz
     ld [hl], 1
     ret
