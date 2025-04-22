@@ -339,10 +339,18 @@ update_cheats:
 game_loader:
 	di
 	wait_vblank
-	memcpy $98e2, frame_top, frame_top.end - frame_top
-	memcpy $9902, frame_mid, frame_mid.end - frame_mid
-	memcpy $9922, frame_bottom, frame_bottom.end - frame_bottom
-	memcpy $9905, menu_text_loading, menu_text_loading.end - menu_text_loading
+	ld a, 1
+	ld [rVBK], a
+	memset_8 $98e2, $10, 4
+	memset_8 $9902, $10, 4
+	memset_8 $9922, $10, 4
+	ld a, 0
+	ld [rVBK], a
+	memcpy_8 $98e2, frame_top, frame_top.end - frame_top
+	memcpy_8 $9902, frame_mid, frame_mid.end - frame_mid
+	memcpy_8 $9922, frame_bottom, frame_bottom.end - frame_bottom
+	wait_vblank
+	memcpy_8 $9905, menu_text_loading, menu_text_loading.end - menu_text_loading
 	memcpy $c300, game_loader_ram, game_loader_ram.end - game_loader_ram
 	jp $c300
 

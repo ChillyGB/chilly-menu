@@ -39,10 +39,19 @@ MACRO memset
 .loop\@
 	ld a, \3
 	ld [hli], a
-	inc bc
 	dec de
 	ld a, d
 	or a, e
+	jr nz, .loop\@
+ENDM
+
+MACRO memset_8
+	ld hl, \1
+	ld d, \2
+.loop\@
+	ld a, \3
+	ld [hli], a
+	dec d
 	jr nz, .loop\@
 ENDM
 

@@ -124,6 +124,11 @@ init_cgb_palettes:
 	set_palette_bg 0, 0, $ff, 14
 	set_palette_bg 0, 0, 0, 15
 
+	set_palette_bg $ff, $ff, $ff, 16
+	set_palette_bg $ff, $21, $8c, 17
+	set_palette_bg 0, $63, $c5, 18
+	set_palette_bg 0, 0, 0, 19
+
 	set_palette_obj $ff, $ff, $ff, 0
 	set_palette_obj $ff, $21, $8c, 1
 	set_palette_obj 0, $63, $c5, 2
